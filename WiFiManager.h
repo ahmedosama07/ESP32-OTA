@@ -250,6 +250,7 @@ class WiFiManager
     //manually start the config portal, autoconnect does this automatically on connect failure
     boolean       startConfigPortal(); // auto generates apname
     boolean       startConfigPortal(char const *apName, char const *apPassword = NULL);
+    boolean       startPortal();
 
     //manually stop the config portal if started manually, stop immediatly if non blocking, flag abort if blocking
     bool          stopConfigPortal();
@@ -525,7 +526,7 @@ class WiFiManager
 
     // defaults
     const byte    DNS_PORT                = 53;
-    String        _apName                 = "no-net";
+    String        _apName                 = "AP is not working";
     String        _apPassword             = "";
     String        _ssid                   = ""; // var temp ssid
     String        _pass                   = ""; // var temp psk

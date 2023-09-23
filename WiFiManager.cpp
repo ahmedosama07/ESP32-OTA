@@ -675,6 +675,8 @@ void WiFiManager::setupDNSD(){
   dnsServer->start(DNS_PORT, F("*"), WiFi.softAPIP());
 }
 
+
+
 void WiFiManager::setupConfigPortal() {
   setupHTTPServer();
   _lastscan = 0; // reset network scan cache
@@ -819,6 +821,110 @@ boolean  WiFiManager::startConfigPortal(char const *apName, char const *apPasswo
   #endif
   return result;
 }
+
+
+boolean  WiFiManager::startPortal() {
+  _begin();
+
+  if(configPortalActive){
+    #ifdef WM_DEBUG_LEVEL
+    DEBUG_WM(DEBUG_VERBOSE,F("Starting Config Portal FAILED, is already running"));
+    #endif    
+    return false;
+  }
+
+  
+  
+  #ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_VERBOSE,F("Starting Config Portal"));
+  #endif
+
+
+  // init configportal globals to known states
+  configPortalActive = true;
+  bool result = connect = abort = false; // loop flags, connect true success, abort true break
+  uint8_t state;
+
+  _configPortalStart = millis();
+
+  // start access point
+  #ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_VERBOSE,F("Enabling AP"));
+  #endif
+  //startAP();
+  WiFiSetCountry();
+
+  // do AP callback if set
+  if ( _apcallback != NULL) {
+    #ifdef WM_DEBUG_LEVEL
+    DEBUG_WM(DEBUG_VERBOSE,F("[CB] _apcallback calling"));
+    #endif
+    _apcallback(this);
+  }
+
+  // init configportal
+  #ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_DEV,F("setupConfigPortal"));
+  #endif
+  setupConfigPortal();
+
+  #ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_DEV,F("setupDNSD"));
+  #endif  
+  setupDNSD();
+  
+
+  if(!_configPortalIsBlocking){
+    #ifdef WM_DEBUG_LEVEL
+      DEBUG_WM(DEBUG_VERBOSE,F("Config Portal Running, non blocking (processing)"));
+      if(_configPortalTimeout > 0) DEBUG_WM(DEBUG_VERBOSE,F("Portal Timeout In"),(String)(_configPortalTimeout/1000) + (String)F(" seconds"));
+    #endif
+    return result; // skip blocking loop
+  }
+
+  // enter blocking loop, waiting for config
+  
+  #ifdef WM_DEBUG_LEVEL
+    DEBUG_WM(DEBUG_VERBOSE,F("Config Portal Running, blocking, waiting for clients..."));
+    if(_configPortalTimeout > 0) DEBUG_WM(DEBUG_VERBOSE,F("Portal Timeout In"),(String)(_configPortalTimeout/1000) + (String)F(" seconds"));
+  #endif
+
+  while(1){
+
+    // if timed out or abort, break
+    if(configPortalHasTimeout() || abort){
+      #ifdef WM_DEBUG_LEVEL
+      DEBUG_WM(DEBUG_DEV,F("configportal loop abort"));
+      #endif
+      shutdownConfigPortal();
+      result = abort ? portalAbortResult : portalTimeoutResult; // false, false
+      if (_configportaltimeoutcallback != NULL) {
+        #ifdef WM_DEBUG_LEVEL
+        DEBUG_WM(DEBUG_VERBOSE,F("[CB] config portal timeout callback"));
+        #endif
+        _configportaltimeoutcallback();  // @CALLBACK
+      }
+      break;
+    }
+
+    state = processConfigPortal();
+    
+    // status change, break
+    // @todo what is this for, should be moved inside the processor
+    // I think.. this is to detect autoconnect by esp in background, there are also many open issues about autoreconnect not working
+
+
+    //if(!configPortalActive) break;
+
+    yield(); // watchdog
+  }
+
+  #ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_NOTIFY,F("config portal exiting"));
+  #endif
+  return result;
+}
+
 
 /**
  * [process description]
@@ -3195,6 +3301,7 @@ String WiFiManager::getConfigPortalSSID() {
  * @return String the SSID name
  */
 String WiFiManager::getSSID() {
+  _ssid = WiFi_SSID();
   return _ssid;
 }
 

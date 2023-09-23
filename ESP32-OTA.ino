@@ -17,7 +17,7 @@ void setup(void) {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200);
 
-  if (!wm.autoConnect("OTA", "password")) {
+  if (!wm.autoConnect()) {
     Serial.println("failed to connect and hit timeout");
     //reset and try again, or maybe put it to deep sleep
     ESP.restart();
@@ -29,6 +29,7 @@ void setup(void) {
   Serial.println(wm.getSSID());
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  wm.startPortal();
 }
 
 void loop(void) {

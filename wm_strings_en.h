@@ -1,15 +1,3 @@
-/**
- * wm_strings_en.h
- * engligh strings for
- * WiFiManager, a library for the ESP8266/Arduino platform
- * for configuration of WiFi credentials using a Captive Portal
- *
- * @author Creator tzapu
- * @author tablatronix
- * @version 0.0.0
- * @license MIT
- */
-
 #ifndef _WM_STRINGS_EN_H_
 #define _WM_STRINGS_EN_H_
 
@@ -143,8 +131,7 @@ const char HTTP_HELP[]             PROGMEM =
  "<td>Reboot the device</td></tr>"
  "<tr><td>/erase</td>"
  "<td>Erase WiFi configuration and reboot device. Device will not reconnect to a network until new WiFi configuration data is entered.</td></tr>"
- "</table>"
- "<p/>Github <a href='https://github.com/tzapu/WiFiManager'>https://github.com/tzapu/WiFiManager</a>.";
+ "</table>";
 #else
 const char HTTP_HELP[]             PROGMEM = "";
 #endif
@@ -220,7 +207,7 @@ const char HTTP_INFO_aboutarduino[] PROGMEM = "<dt>Arduino</dt><dd>{1}</dd>";
 const char HTTP_INFO_aboutsdk[]     PROGMEM = "<dt>ESP-SDK/IDF</dt><dd>{1}</dd>";
 const char HTTP_INFO_aboutdate[]    PROGMEM = "<dt>Build date</dt><dd>{1}</dd>";
 
-const char S_brand[]              PROGMEM = "WiFiManager";
+const char S_brand[]              PROGMEM = "WiFi Manager";
 const char S_debugPrefix[]        PROGMEM = "*wm:";
 const char S_y[]                  PROGMEM = "Yes";
 const char S_n[]                  PROGMEM = "No";
