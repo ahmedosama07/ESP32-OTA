@@ -1,10 +1,4 @@
-// #include <Arduino.h>
-// #include <WiFi.h>
-// #include <AsyncTCP.h>
-// #include <ESPAsyncWebServer.h>
-
 #include "WiFiManager.h"
-//#include <AsyncElegantOTA.h>
 
 #define FORMAT 23
 #define FORMAT_LITTLEFS_IF_FAILED true
@@ -16,6 +10,9 @@ void setup(void) {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200);
+
+  wm.setDebugOutput(3);
+  
 
   if (!wm.autoConnect()) {
     Serial.println("failed to connect and hit timeout");
@@ -29,13 +26,15 @@ void setup(void) {
   Serial.println(wm.getSSID());
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  wm.startPortal();
+  wm.setConfigPortalBlocking(false);
+  wm.startWebPortal();
 }
 
 void loop(void) {
+  wm.process();
   if(digitalRead(FORMAT)==LOW){
     Serial.println("Resetting configuration");
     wm.resetSettings();
     ESP.restart();
-  }
+  } 
 }

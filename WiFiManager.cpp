@@ -879,6 +879,7 @@ boolean  WiFiManager::startPortal() {
       DEBUG_WM(DEBUG_VERBOSE,F("Config Portal Running, non blocking (processing)"));
       if(_configPortalTimeout > 0) DEBUG_WM(DEBUG_VERBOSE,F("Portal Timeout In"),(String)(_configPortalTimeout/1000) + (String)F(" seconds"));
     #endif
+    Serial.println("Config Portal Running, non blocking (processing)");
     return result; // skip blocking loop
   }
 
